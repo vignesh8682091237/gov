@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: consent-link-analytics-backend
+    env: python
+    region: singapore
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --workers 2 --bind 0.0.0.0:$PORT wsgi:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: consent-analytics-db
+          property: connectionString
+      - key: CORS_ORIGINS
+        value: https://your-firebase-app.web.app
+      - key: FORCE_HTTPS
+        value: true
+      - key: MASK_IPS_IN_DASHBOARD
+        value: true
+      - key: DATA_RETENTION_DAYS
+        value: 180
+
+databases:
+  - name: consent-analytics-db
+    plan: free
+    region: singapore
