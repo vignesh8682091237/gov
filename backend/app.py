@@ -59,6 +59,34 @@ def create_app(config_object=None):
     def health():
         return jsonify({"status": "ok"})
 
+    @app.route("/api/setup-admin", methods=["POST"])
+    def setup_admin():
+        """One-time setup: init DB + create first admin. Protected by SETUP_TOKEN."""
+        import os
+        from models import Admin
+
+        token = request.headers.get("X-Setup-Token", "")
+        expected = os.environ.get("SETUP_TOKEN", "")
+        if not expected or token != expected:
+            return jsonify({"error": "Forbidden"}), 403
+
+        db.create_all()
+        data = request.get_json(silent=True) or {}
+        username = (data.get("username") or "").strip()
+        password = data.get("password") or ""
+        if not username or not password:
+            return jsonify({"error": "username and password required"}), 400
+        if Admin.query.filter_by(username=username).first():
+            return jsonify({"error": "Admin already exists"}), 409
+
+        admin = Admin()
+        admin.username = username
+        admin.set_password(password)
+        db.session.add(admin)
+        db.session.commit()
+        return jsonify({"message": f"Admin '{username}' created successfully."})
+
+
     @app.errorhandler(404)
     def not_found(_e):
         return jsonify({"error": "Not found."}), 404
