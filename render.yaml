@@ -19,7 +19,7 @@ services:
           name: consent-analytics-db
           property: connectionString
       - key: CORS_ORIGINS
-        value: https://your-firebase-app.web.app
+        value: https://point-6155f.web.app,https://point-6155f.firebaseapp.com
       - key: FORCE_HTTPS
         value: true
       - key: MASK_IPS_IN_DASHBOARD
