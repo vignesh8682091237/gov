@@ -29,10 +29,17 @@ class BaseConfig:
     )
 
     # --- Database -------------------------------------------------------
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
+    # Render (and some other providers) set DATABASE_URL with the
+    # "postgresql://" scheme. SQLAlchemy 2.x treats that as psycopg3
+    # ("psycopg"), but we ship psycopg2-binary. Replace the prefix so
+    # the correct driver is always used.
+    _db_url = os.environ.get(
         "DATABASE_URL",
         "postgresql+psycopg2://postgres:postgres@localhost:5432/consent_analytics",
     )
+    if _db_url.startswith("postgresql://"):
+        _db_url = _db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    SQLALCHEMY_DATABASE_URI = _db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # --- CORS -------------------------------------------------------
