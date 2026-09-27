@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from config import get_config
 from extensions import db, cors, limiter
