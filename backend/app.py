@@ -46,6 +46,7 @@ def create_app(config_object=None):
     from routes.tracking import tracking_bp
     from routes.dashboard import dashboard_bp
     from routes.visitors import visitors_bp, audit_bp
+    from routes.registrations import registrations_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
@@ -54,6 +55,23 @@ def create_app(config_object=None):
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(visitors_bp)
     app.register_blueprint(audit_bp)
+    app.register_blueprint(registrations_bp)
+
+    with app.app_context():
+        try:
+            db.create_all()
+            from models import Admin
+            if Admin.query.count() == 0:
+                admin_user = os.environ.get("DEFAULT_ADMIN_USER", "admin")
+                admin_pass = os.environ.get("DEFAULT_ADMIN_PASS", "admin123")
+                admin = Admin()
+                admin.username = admin_user
+                admin.set_password(admin_pass)
+                db.session.add(admin)
+                db.session.commit()
+                app.logger.info(f"Initialized default admin account: {admin_user}")
+        except Exception as e:
+            app.logger.warning(f"DB auto-init deferred or failed: {e}")
 
     @app.route("/api/health", methods=["GET"])
     def health():

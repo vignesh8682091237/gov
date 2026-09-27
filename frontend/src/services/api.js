@@ -60,4 +60,12 @@ export const auditApi = {
   list: (params) => api.get("/api/audit", { params }),
 };
 
+export const registrationsApi = {
+  create: (payload) => api.post("/api/registrations", payload),
+  list: (params) => api.get("/api/registrations", { params }),
+  exportCsv: () => api.get("/api/registrations/export", { responseType: "blob" }),
+  remove: (id) => api.delete(`/api/registrations/${id}`),
+};
+
 export default api;
+

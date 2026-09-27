@@ -4,6 +4,7 @@ import { authApi } from "../services/api.js";
 
 const links = [
   { to: "/dashboard", label: "Dashboard" },
+  { to: "/registrations", label: "Registrations" },
   { to: "/links", label: "Tracking Links" },
   { to: "/links/new", label: "Create Link" },
   { to: "/visitors", label: "Visitor Analytics" },
